@@ -1,57 +1,54 @@
 import React from 'react';
-import { Download, QrCode } from 'lucide-react';
+import { Download, RefreshCw } from 'lucide-react';
 
 interface QrCodeDisplayProps {
+  text: string;
   qrDataUrl: string;
   isGenerating: boolean;
-  downloadQR: () => void;
   canvasRef: React.RefObject<HTMLCanvasElement>;
-  text: string;
+  onDownload: () => void;
 };
 
 const QrCodeDisplay: React.FC<QrCodeDisplayProps> = ({
+  text,
   qrDataUrl,
   isGenerating,
-  downloadQR,
   canvasRef,
-  text,
+  onDownload,
 }) => {
   return (
-    <div className="bg-white rounded-2xl shadow-lg p-6 border border-gray-100">
-      <div className="flex items-center justify-between mb-4">
-        <h2 className="text-xl font-semibold text-gray-900">Generated QR Code</h2>
-        {qrDataUrl && (
-          <button
-            onClick={downloadQR}
-            className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200"
-          >
-            <Download className="w-4 h-4" />
-            Download
-          </button>
-        )}
-      </div>
-      
-      <div className="flex items-center justify-center">
-        {text.trim() ? (
-          <div className="relative">
-            <canvas
-              ref={canvasRef}
-              className="max-w-full h-auto rounded-lg border border-gray-200"
-              style={{ display: qrDataUrl ? 'block' : 'none' }}
-            />
-            {isGenerating && (
-              <div className="absolute inset-0 flex items-center justify-center bg-white bg-opacity-75 rounded-lg">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-              </div>
-            )}
+    <div className="flex flex-col items-center">
+      <div className="bg-gray-50 rounded-xl p-6 mb-6 relative">
+        {isGenerating && (
+          <div className="absolute inset-0 bg-white bg-opacity-75 rounded-xl flex items-center justify-center">
+            <RefreshCw className="w-6 h-6 text-blue-500 animate-spin" />
           </div>
-        ) : (
-          <div className="flex flex-col items-center justify-center py-16 text-gray-400">
-            <QrCode className="w-16 h-16 mb-4" />
-            <p className="text-lg">Enter text to generate QR code</p>
+        )}
+        
+        <canvas
+          ref={canvasRef}
+          className="max-w-full h-auto rounded-lg shadow-sm"
+          style={{ display: qrDataUrl ? 'block' : 'none' }}
+        />
+        
+        {!text.trim() && (
+          <div className="w-72 h-72 bg-gray-200 rounded-lg flex items-center justify-center">
+            <p className="text-gray-500 text-center">
+              Enter content to generate QR code
+            </p>
           </div>
         )}
       </div>
+
+      {qrDataUrl && (
+        <button
+          onClick={onDownload}
+          className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg transition-all duration-200 font-medium shadow-lg hover:shadow-xl"
+        >
+          <Download className="w-5 h-5" />
+          Download QR Code
+        </button>
+      )}
     </div>
   );
 };

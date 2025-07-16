@@ -4,6 +4,7 @@ import Header from './components/Header';
 import InputSection from './components/InputSection';
 import Customization from './components/Customization';
 import QrCodeDisplay from './components/QrCodeDisplay';
+import ColorPresets from './components/ColorPresets';
 import Info from './components/Info';
 
 const App: React.FC = () => {
@@ -17,33 +18,47 @@ const App: React.FC = () => {
     setForegroundColor,
     setBackgroundColor,
     downloadQR,
+    canvasRef,
   } = useQRCodeGenerator();
 
+  const handlePresetColor = (fg: string, bg: string) => {
+    setForegroundColor(fg);
+    setBackgroundColor(bg);
+  };
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 py-8 px-4">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 py-12 px-4">
       <div className="max-w-4xl mx-auto">
-        <Header title="QR Code Generator" subtitle="Convert any text to QR code instantly" />
-        <div className="grid lg:grid-cols-2 gap-8">
-          <div className="space-y-6">
-            <InputSection text={text} setText={setText} />
-            <Customization
-              foregroundColor={foregroundColor}
-              setForegroundColor={setForegroundColor}
-              backgroundColor={backgroundColor}
-              setBackgroundColor={setBackgroundColor}
-            />
-          </div>
-          <div className="space-y-6">
+        <Header />
+
+        <div className="bg-white rounded-2xl shadow-xl p-8">
+          <div className="grid lg:grid-cols-2 gap-8">
+            {/* Input Section */}
+            <div className="space-y-6">
+              <InputSection text={text} setText={setText} />
+              
+              <Customization
+                foregroundColor={foregroundColor}
+                backgroundColor={backgroundColor}
+                setForegroundColor={setForegroundColor}
+                setBackgroundColor={setBackgroundColor}
+              />
+
+              <ColorPresets onPresetSelect={handlePresetColor} />
+            </div>
+
+            {/* QR Code Display */}
             <QrCodeDisplay
+              text={text}
               qrDataUrl={qrDataUrl}
               isGenerating={isGenerating}
-              downloadQR={downloadQR}
-              canvasRef={useQRCodeGenerator().canvasRef}
-              text={text}
+              canvasRef={canvasRef}
+              onDownload={downloadQR}
             />
-            <Info />
           </div>
         </div>
+
+        <Info />
       </div>
     </div>
   );

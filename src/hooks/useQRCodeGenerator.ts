@@ -15,10 +15,10 @@ interface UseQRCodeGeneratorResult {
 };
 
 export const useQRCodeGenerator = (): UseQRCodeGeneratorResult => {
-  const [text, setText] = useState('');
+  const [text, setText] = useState('https://example.com');
   const [qrDataUrl, setQrDataUrl] = useState('');
   const [foregroundColor, setForegroundColor] = useState('#000000');
-  const [backgroundColor, setBackgroundColor] = useState('#ADFF2F');
+  const [backgroundColor, setBackgroundColor] = useState('#ffffff');
   const [isGenerating, setIsGenerating] = useState(false);
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
@@ -33,23 +33,25 @@ export const useQRCodeGenerator = (): UseQRCodeGeneratorResult => {
       const canvas = canvasRef.current;
       if (canvas) {
         await QRCode.toCanvas(canvas, inputText, {
-          version: 3,
-          width: 256,
-          margin: 4,
+          version: undefined,
+          width: 300,
+          margin: 2,
           color: {
             dark: foregroundColor,
             light: backgroundColor,
           },
+          errorCorrectionLevel: 'M',
         });
-        const dataUrl = canvas.toDataURL();
+        const dataUrl = canvas.toDataURL('image/png');
         setQrDataUrl(dataUrl);
       }
     } catch (error) {
       console.error('Error generating QR code:', error);
+      setQrDataUrl('');
     } finally {
       setIsGenerating(false);
     }
-  }, [canvasRef, setQrDataUrl, setIsGenerating, foregroundColor, backgroundColor]);
+  }, [foregroundColor, backgroundColor]);
 
   useEffect(() => {
     const timeoutId = setTimeout(() => {
@@ -59,14 +61,16 @@ export const useQRCodeGenerator = (): UseQRCodeGeneratorResult => {
     return () => clearTimeout(timeoutId);
   }, [text, foregroundColor, backgroundColor, generateQR]);
 
-  const downloadQR = () => {
+  const downloadQR = useCallback(() => {
     if (qrDataUrl) {
       const link = document.createElement('a');
-      link.download = 'qr_code.png';
+      link.download = `qr-code-${Date.now()}.png`;
       link.href = qrDataUrl;
+      document.body.appendChild(link);
       link.click();
+      document.body.removeChild(link);
     }
-  };
+  }, [qrDataUrl]);
 
   return {
     text,
@@ -78,6 +82,6 @@ export const useQRCodeGenerator = (): UseQRCodeGeneratorResult => {
     setForegroundColor,
     setBackgroundColor,
     downloadQR,
-    canvasRef
+    canvasRef,
   };
 };

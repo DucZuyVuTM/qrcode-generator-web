@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Download, RefreshCw } from 'lucide-react';
 
 interface QrCodeDisplayProps {
@@ -16,6 +16,20 @@ const QrCodeDisplay: React.FC<QrCodeDisplayProps> = ({
   canvasRef,
   onDownload,
 }) => {
+  const [showPlaceholder, setShowPlaceholder] = useState(false);
+
+  useEffect(() => {
+    if (!text.trim()) {
+      const timeoutId = setTimeout(() => {
+        setShowPlaceholder(true);
+      }, 300);
+
+      return () => clearTimeout(timeoutId);
+    } else {
+      setShowPlaceholder(false);
+    }
+  }, [text]);
+
   return (
     <div className="flex flex-col items-center">
       <div className="bg-gray-50 rounded-xl p-6 mb-6 relative">
@@ -31,8 +45,8 @@ const QrCodeDisplay: React.FC<QrCodeDisplayProps> = ({
           style={{ display: qrDataUrl ? 'block' : 'none' }}
         />
         
-        {!text.trim() && (
-          <div className="w-72 h-72 bg-gray-200 rounded-lg flex items-center justify-center">
+        {!text.trim() && showPlaceholder && (
+          <div className="w-72 h-72 bg-gray-200 rounded-lg flex items-center justify-center transition-opacity duration-300 ease-in-out">
             <p className="text-gray-500 text-center">
               Enter content to generate QR code
             </p>

@@ -46,7 +46,7 @@ const QrCodeDisplay: React.FC<QrCodeDisplayProps> = ({
         />
         
         {!text.trim() && showPlaceholder && (
-          <div className="w-72 h-72 bg-gray-200 rounded-lg flex items-center justify-center transition-opacity duration-300 ease-in-out">
+          <div className="w-full h-72 p-6 bg-gray-200 rounded-lg flex items-center justify-center transition-opacity duration-300 ease-in-out">
             <p className="text-gray-500 text-center">
               Enter content to generate QR code
             </p>

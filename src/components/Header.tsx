@@ -6,7 +6,7 @@ const Header: React.FC = () => {
     <div className="text-center mb-8">
       <div className="flex items-center justify-center gap-3 mb-4">
         <QrCode className="w-12 h-12 text-blue-600" />
-        <h1 className="text-4xl font-bold text-gray-800 mb-2">
+        <h1 className="text-4xl font-bold text-gray-800 mb-2 max-[418px]:w-[171px]">
           QR Code Generator
         </h1>
       </div>

@@ -32,26 +32,30 @@ const QrCodeDisplay: React.FC<QrCodeDisplayProps> = ({
 
   return (
     <div className="flex flex-col items-center">
-      <div className="bg-gray-50 rounded-xl p-6 mb-6 relative">
-        {isGenerating && (
-          <div className="absolute inset-0 bg-white bg-opacity-75 rounded-xl flex items-center justify-center">
-            <RefreshCw className="w-6 h-6 text-blue-500 animate-spin" />
+      <div className="w-full max-w-xs mx-auto">
+        <div className="bg-gray-50 rounded-xl p-6 mb-6 relative aspect-square">
+          {isGenerating && (
+            <div className="absolute inset-0 bg-white bg-opacity-75 rounded-xl flex items-center justify-center">
+              <RefreshCw className="w-6 h-6 text-blue-500 animate-spin" />
+            </div>
+          )}
+          
+          <div className="w-full h-full flex items-center justify-center">
+            <canvas
+              ref={canvasRef}
+              className="max-w-full max-h-full rounded-lg shadow-sm"
+              style={{ display: qrDataUrl ? 'block' : 'none' }}
+            />
+            
+            {!text.trim() && showPlaceholder && (
+              <div className="w-full h-full bg-gray-200 rounded-lg flex items-center justify-center transition-opacity duration-300 ease-in-out">
+                <p className="text-gray-500 text-center px-4">
+                  Enter content to generate QR code
+                </p>
+              </div>
+            )}
           </div>
-        )}
-        
-        <canvas
-          ref={canvasRef}
-          className="max-w-full h-auto rounded-lg shadow-sm"
-          style={{ display: qrDataUrl ? 'block' : 'none' }}
-        />
-        
-        {!text.trim() && showPlaceholder && (
-          <div className="w-full h-72 p-6 bg-gray-200 rounded-lg flex items-center justify-center transition-opacity duration-300 ease-in-out">
-            <p className="text-gray-500 text-center">
-              Enter content to generate QR code
-            </p>
-          </div>
-        )}
+        </div>
       </div>
 
       {qrDataUrl && (

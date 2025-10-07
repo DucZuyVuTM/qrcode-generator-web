@@ -6,6 +6,7 @@ import Customization from './components/Customization';
 import QrCodeDisplay from './components/QrCodeDisplay';
 import ColorPresets from './components/ColorPresets';
 import Info from './components/Info';
+import Footer from './components/Footer';
 
 const App: React.FC = () => {
   const {
@@ -27,7 +28,7 @@ const App: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 py-12 px-4">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 pt-12 pb-6 px-4">
       <div className="max-w-4xl mx-auto">
         <Header />
 
@@ -59,6 +60,7 @@ const App: React.FC = () => {
         </div>
 
         <Info />
+        <Footer />
       </div>
     </div>
   );

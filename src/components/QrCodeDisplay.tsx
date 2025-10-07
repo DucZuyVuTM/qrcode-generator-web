@@ -64,7 +64,7 @@ const QrCodeDisplay: React.FC<QrCodeDisplayProps> = ({
           className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg transition-all duration-200 font-medium shadow-lg hover:shadow-xl"
         >
           <Download className="w-5 h-5" />
-          Download QR Code
+          Download QRCode
         </button>
       )}
     </div>

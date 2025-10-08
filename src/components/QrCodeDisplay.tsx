@@ -44,6 +44,7 @@ const QrCodeDisplay: React.FC<QrCodeDisplayProps> = ({
             <canvas
               ref={canvasRef}
               className="max-w-full max-h-full rounded-lg shadow-sm"
+              style={{ display: qrDataUrl ? 'block' : 'none' }}
             />
             
             {!text.trim() && showPlaceholder && (

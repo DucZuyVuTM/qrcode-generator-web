@@ -87,4 +87,19 @@ describe('QrCodeDisplay Component', () => {
     const downloadButton = screen.queryByRole('button', { name: /download qr code/i });
     expect(downloadButton).not.toBeInTheDocument();
   });
+
+  it('should not show QR Code when text is empty', async () => {
+    const { container } = render(
+      <QrCodeDisplay
+        text=""
+        qrDataUrl=""
+        isGenerating={false}
+        canvasRef={canvasRef}
+        onDownload={onDownloadMock}
+      />
+    );
+
+    const canvas = container.querySelector('canvas');
+    expect(canvas).toHaveStyle({ display: 'none' });
+  });
 });

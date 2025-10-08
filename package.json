@@ -8,7 +8,9 @@
     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "test": "vitest"
+    "test": "vitest",
+    "test:mutation": "stryker run",
+    "test:coverage": "vitest run --coverage"
   },
   "dependencies": {
     "@types/qrcode": "^1.5.5",
@@ -20,11 +22,13 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.9.1",
+    "@stryker-mutator/vitest-runner": "^9.2.0",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.0",
     "@types/react": "^18.3.5",
     "@types/react-dom": "^18.3.0",
     "@vitejs/plugin-react": "^4.3.1",
+    "@vitest/coverage-v8": "^3.2.4",
     "autoprefixer": "^10.4.18",
     "eslint": "^9.9.1",
     "eslint-plugin-react-hooks": "^5.1.0-rc.0",

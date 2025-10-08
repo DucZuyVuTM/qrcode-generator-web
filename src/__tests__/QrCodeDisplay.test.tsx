@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import QrCodeDisplay from '../components/QrCodeDisplay';
 import { createRef } from 'react';
@@ -17,18 +17,18 @@ describe('QrCodeDisplay Component', () => {
   beforeEach(() => {
     canvasRef = createRef<HTMLCanvasElement>();
     onDownloadMock = vi.fn();
-    vi.useFakeTimers();
+    vi.useFakeTimers(); // Enable fake timers
   });
 
   afterEach(() => {
-    vi.useRealTimers();
+    vi.useRealTimers(); // Clean up timers
   });
 
   it('should render canvas and show it when qrDataUrl is provided', () => {
     const { container } = render(
       <QrCodeDisplay
         text="https://example.com"
-        qrDataUrl="data:image/png;base64,test"
+        qrDataUrl="data:image/png/base64,test"
         isGenerating={false}
         canvasRef={canvasRef}
         onDownload={onDownloadMock}
@@ -44,7 +44,7 @@ describe('QrCodeDisplay Component', () => {
     render(
       <QrCodeDisplay
         text="https://example.com"
-        qrDataUrl="data:image/png;base64,test"
+        qrDataUrl="data:image/png/base64,test"
         isGenerating={false}
         canvasRef={canvasRef}
         onDownload={onDownloadMock}
@@ -60,7 +60,7 @@ describe('QrCodeDisplay Component', () => {
     render(
       <QrCodeDisplay
         text="https://example.com"
-        qrDataUrl="data:image/png;base64,test"
+        qrDataUrl="data:image/png/base64,test"
         isGenerating={false}
         canvasRef={canvasRef}
         onDownload={onDownloadMock}
@@ -88,7 +88,7 @@ describe('QrCodeDisplay Component', () => {
     expect(downloadButton).not.toBeInTheDocument();
   });
 
-  it('should not show QR Code when text is empty', async () => {
+  it('should not show QR Code when text is empty', () => {
     const { container } = render(
       <QrCodeDisplay
         text=""
@@ -101,5 +101,115 @@ describe('QrCodeDisplay Component', () => {
 
     const canvas = container.querySelector('canvas');
     expect(canvas).toHaveStyle({ display: 'none' });
+  });
+
+  it('should show loading spinner when isGenerating is true', () => {
+    const { container } = render(
+      <QrCodeDisplay
+        text="https://example.com"
+        qrDataUrl="data:image/png/base64,test"
+        isGenerating={true}
+        canvasRef={canvasRef}
+        onDownload={onDownloadMock}
+      />
+    );
+
+    const spinner = screen.getByTestId('mock-refresh-icon');
+    expect(spinner).toBeInTheDocument();
+    const canvas = container.querySelector('canvas'); // Use querySelector instead of queryByRole
+    expect(canvas).toBeInTheDocument(); // Canvas still exists but may be covered
+  });
+
+  it('should show placeholder after 300ms when text is empty', async () => {
+    const { container } = render(
+      <QrCodeDisplay
+        text=""
+        qrDataUrl="data:image/png/base64,test"
+        isGenerating={false}
+        canvasRef={canvasRef}
+        onDownload={onDownloadMock}
+      />
+    );
+
+    expect(screen.queryByText('Enter content to generate QR code')).not.toBeInTheDocument();
+
+    act(() => {
+      vi.advanceTimersByTime(350); // Advance time by 350ms to trigger 300ms timeout
+    });
+
+    await waitFor(
+      () => {
+        expect(screen.getByText('Enter content to generate QR code')).toBeInTheDocument();
+      },
+      { timeout: 1000 } // Increased timeout
+    );
+
+    const canvas = container.querySelector('canvas');
+    expect(canvas).toHaveStyle({ display: 'block' }); // Canvas exists but covered by placeholder
+  });
+
+  it('should clear timeout and hide placeholder when text becomes non-empty', async () => {
+    const { rerender } = render(
+      <QrCodeDisplay
+        text=""
+        qrDataUrl="data:image/png/base64,test"
+        isGenerating={false}
+        canvasRef={canvasRef}
+        onDownload={onDownloadMock}
+      />
+    );
+
+    act(() => {
+      vi.advanceTimersByTime(350); // Trigger placeholder
+    });
+
+    await waitFor(
+      () => {
+        expect(screen.getByText('Enter content to generate QR code')).toBeInTheDocument();
+      },
+      { timeout: 1000 } // Increased timeout
+    );
+
+    rerender(
+      <QrCodeDisplay
+        text="https://example.com"
+        qrDataUrl="data:image/png/base64,test"
+        isGenerating={false}
+        canvasRef={canvasRef}
+        onDownload={onDownloadMock}
+      />
+    );
+
+    expect(screen.queryByText('Enter content to generate QR code')).not.toBeInTheDocument();
+    const canvas = screen.queryByRole('canvas');
+    expect(canvas).toHaveStyle({ display: 'block' });
+  });
+
+  it('should handle text with only whitespace', async () => {
+    const { container } = render(
+      <QrCodeDisplay
+        text="   "
+        qrDataUrl="data:image/png/base64,test"
+        isGenerating={false}
+        canvasRef={canvasRef}
+        onDownload={onDownloadMock}
+      />
+    );
+
+    expect(screen.queryByText('Enter content to generate QR code')).not.toBeInTheDocument();
+
+    act(() => {
+      vi.advanceTimersByTime(350); // Advance time by 350ms to trigger 300ms timeout
+    });
+
+    await waitFor(
+      () => {
+        expect(screen.getByText('Enter content to generate QR code')).toBeInTheDocument();
+      },
+      { timeout: 1000 } // Increased timeout
+    );
+
+    const canvas = container.querySelector('canvas');
+    expect(canvas).toHaveStyle({ display: 'block' }); // Canvas exists but covered by placeholder
   });
 });

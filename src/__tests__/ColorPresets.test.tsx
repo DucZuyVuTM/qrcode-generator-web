@@ -10,6 +10,34 @@ describe('ColorPresets Component', () => {
     onPresetSelectMock = vi.fn();
   });
 
+  it('should render color presets label', () => {
+    render(<ColorPresets onPresetSelect={onPresetSelectMock} />);
+
+    expect(screen.getByText('Color Presets')).toBeInTheDocument();
+  });
+
+  it('should render all 6 preset buttons', () => {
+    render(<ColorPresets onPresetSelect={onPresetSelectMock} />);
+
+    const presetNames = ['Classic', 'Ocean', 'Forest', 'Sunset', 'Purple', 'Amber'];
+    
+    presetNames.forEach((name) => {
+      expect(screen.getByText(name)).toBeInTheDocument();
+    });
+
+    // Check that we have exactly 6 buttons
+    const buttons = screen.getAllByRole('button');
+    expect(buttons).toHaveLength(6);
+  });
+
+  it('should render color preview circles for each preset', () => {
+    const { container } = render(<ColorPresets onPresetSelect={onPresetSelectMock} />);
+
+    // Each preset has 2 color circles (fg and bg)
+    const colorCircles = container.querySelectorAll('.w-4.h-4.rounded-full');
+    expect(colorCircles).toHaveLength(12); // 6 presets × 2 circles
+  });
+
   it('should call onPresetSelect with correct colors when Classic preset is clicked', () => {
     render(<ColorPresets onPresetSelect={onPresetSelectMock} />);
 
@@ -64,6 +92,33 @@ describe('ColorPresets Component', () => {
     fireEvent.click(amberButton!);
 
     expect(onPresetSelectMock).toHaveBeenCalledWith('#d97706', '#fef3c7');
+  });
+
+  it('should apply correct inline styles to color circles', () => {
+    render(<ColorPresets onPresetSelect={onPresetSelectMock} />);
+
+    // Find the Amber button using getByText and its closest button
+    const amberButton = screen.getByText('Amber').closest('button');
+    if (!amberButton) throw new Error('Amber button not found');
+
+    // Query color circles within the Amber button
+    const colorCircles = amberButton.querySelectorAll('.w-4.h-4.rounded-full');
+    
+    expect(colorCircles.length).toBe(2); // Ensure 2 circles are found
+    expect(colorCircles[0]).toHaveStyle({ backgroundColor: '#d97706' }); // Foreground
+    expect(colorCircles[1]).toHaveStyle({ backgroundColor: '#fef3c7' }); // Background
+  });
+
+  it('should have proper CSS classes for styling', () => {
+    render(<ColorPresets onPresetSelect={onPresetSelectMock} />);
+
+    const button = screen.getByText('Classic').closest('button');
+    
+    expect(button).toHaveClass('p-3');
+    expect(button).toHaveClass('border');
+    expect(button).toHaveClass('border-gray-200');
+    expect(button).toHaveClass('rounded-lg');
+    expect(button).toHaveClass('hover:border-blue-300');
   });
 
   it('should allow multiple preset selections', () => {
